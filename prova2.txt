@@ -19,7 +19,7 @@
 - Other preferences: avoids evening shifts and holidays
 
 **Worker 5**
-- Preference: afternoon shift
+- Preference: morning shift
 - Availability: every day
 - Other preferences: occasionally accepts night shifts, avoids more than n consecutive afternoon shifts
 
