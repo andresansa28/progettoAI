@@ -1,0 +1,154 @@
+{
+    "preferences": [
+        {
+            "worker_id": 0,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "MONDAY",
+            "disliked_shifts": [
+                "NIGHT",
+                "Christmas Day"
+            ],
+            "unavailable_dates": [
+                "2025-12-25"
+            ]
+        },
+        {
+            "worker_id": 1,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "FRIDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": []
+        },
+        {
+            "worker_id": 2,
+            "preferred_shift": "NIGHT",
+            "preferred_day_off": "SUNDAY",
+            "disliked_shifts": [],
+            "unavailable_dates": [
+                "2025-12-31"
+            ]
+        },
+        {
+            "worker_id": 3,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "SATURDAY",
+            "disliked_shifts": [
+                "NIGHT",
+                "Christmas Day",
+                "New Year's Day"
+            ],
+            "unavailable_dates": [
+                "2025-12-25",
+                "2026-01-01"
+            ]
+        },
+        {
+            "worker_id": 4,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "WEDNESDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": []
+        },
+        {
+            "worker_id": 5,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "SATURDAY",
+            "disliked_shifts": [
+                "NIGHT",
+                "New Year's Day"
+            ],
+            "unavailable_dates": [
+                "2026-01-01"
+            ]
+        },
+        {
+            "worker_id": 6,
+            "preferred_shift": "NIGHT",
+            "preferred_day_off": "TUESDAY",
+            "disliked_shifts": [
+                "Christmas Day"
+            ],
+            "unavailable_dates": [
+                "2025-12-25"
+            ]
+        },
+        {
+            "worker_id": 7,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "THURSDAY",
+            "disliked_shifts": [
+                "NIGHT",
+                "Christmas Day",
+                "St. Stephen's Day"
+            ],
+            "unavailable_dates": [
+                "2025-12-25",
+                "2025-12-26"
+            ]
+        },
+        {
+            "worker_id": 8,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "SUNDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": []
+        },
+        {
+            "worker_id": 9,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "MONDAY",
+            "disliked_shifts": [
+                "Christmas Eve",
+                "New Year's Eve"
+            ],
+            "unavailable_dates": [
+                "2025-12-24",
+                "2025-12-31"
+            ]
+        },
+        {
+            "worker_id": 10,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "FRIDAY",
+            "disliked_shifts": [
+                "Christmas Eve",
+                "New Year's Eve"
+            ],
+            "unavailable_dates": [
+                "2025-12-24",
+                "2025-12-31"
+            ]
+        },
+        {
+            "worker_id": 11,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "THURSDAY",
+            "disliked_shifts": [
+                "NIGHT",
+                "New Year's Day"
+            ],
+            "unavailable_dates": [
+                "2026-01-01"
+            ]
+        },
+        {
+            "worker_id": 12,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "TUESDAY",
+            "disliked_shifts": [
+                "Christmas Eve",
+                "Christmas Day"
+            ],
+            "unavailable_dates": [
+                "2025-12-24",
+                "2025-12-25"
+            ]
+        }
+    ]
+}

@@ -1,76 +1,163 @@
-import json
+from typing import List, Optional
+
+from pydantic import BaseModel, Field
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 
-def estrai_preferenze_langchain(file_txt, nome_modello="llama3.1:8b"):
-    try:
-        with open(file_txt, "r", encoding="utf-8") as f:
-            testo = f.read()
-    except FileNotFoundError:
-        return f"Errore: Il file {file_txt} non è stato trovato."
+# =====================================================
+# SCHEMA JSON
+# =====================================================
 
-    llm = ChatOllama(
-        model=nome_modello,
-        temperature=0,
-        num_predict=3000,
+
+class WorkerPreference(BaseModel):
+
+    worker_id: int = Field(description="Identificativo del lavoratore")
+
+    preferred_shift: Optional[str] = Field(
+        default=None, description="Turno preferito: MATTINA, POMERIGGIO o NOTTE"
     )
 
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", """Analizza le preferenze dei lavoratori e trasformale in dati strutturati.
-        Restituisci SOLO un JSON valido, senza Markdown.
-        
-        Usa ESCLUSIVAMENTE questo formato (una lista di oggetti), PER OGNI LAVORATORE, QUINDI IN TOTALE 10 :
-        [
-          {{
-            "worker": "<nome_lavoratore>",
-            "preferred_shift": "MORNING" | "AFTERNOON" | "NIGHT" | null,
-            "uncomfortable_shifts": [
-              {{
-                "type": "NIGHT_SHIFT" | "HOLIDAY_SHIFT" | "SPECIFIC_DATE" | "CONSECUTIVE_SHIFT_SEQUENCE" | "CONSECUTIVE_WORKDAYS" | "WEEKEND_SHIFT",
-                "shift": "MORNING" | "AFTERNOON" | "NIGHT" | null,
-                "date": "YYYY-MM-DD" | null,
-                "max": <numero_massimo> | null
-              }}
-            ],
-            "availability": {{
-              "available_every_day": true | false | null,
-              "available_days": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"] | null,
-              "unavailable_days": ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"] | null,
-              "available_dates": ["YYYY-MM-DD"] | null,
-              "unavailable_dates": ["YYYY-MM-DD"] | null,
-              "available_holidays": true | false | null,
-              "available_weekends": true | false | null
-            }}
-          }}
-        ]
+    preferred_day_off: Optional[str] = Field(
+        default=None, description="Giorno libero preferito"
+    )
 
-        Regole di estrazione:
-        - "preferred_shift" indica il turno preferito principale.
-        - Le date del periodo sono dal 2026-12-07 al 2027-01-06.
-        - Natale = 2026-12-25, Santo Stefano = 2026-12-26, Capodanno = 2027-01-01, Vigilia di Natale = 2026-12-24, Vigilia di capodanno = 2026-12-31
-        - Se un'informazione manca, usa null o []."""),
-        
-        # Questa variabile {testo} verrà riempita automaticamente da LangChain
-        ("user", "Ecco il testo da analizzare:\n{testo}")
-    ])
+    disliked_shifts: List[str] = Field(
+        default_factory=list, description="Turni sgraditi"
+    )
+
+    unavailable_dates: List[str] = Field(
+        default_factory=list, description="Giorni in cui il lavoratore non può lavorare"
+    )
+
+
+class PreferencesFile(BaseModel):
+
+    workers: List[WorkerPreference]
+
+
+# =====================================================
+# PROMPT
+# =====================================================
+
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """
+Sei un sistema di estrazione informazioni.
+
+Riceverai un file contenente le preferenze di più lavoratori.
+
+Per ogni lavoratore estrai:
+
+- worker_id
+- preferred_shift
+- preferred_day_off
+- disliked_shifts
+- unavailable_dates
+
+Regole:
+
+preferred_shift:
+MORNING
+AFTERNOON
+NIGHT
+
+preferred_day_off:
+MONDAY
+TUESDAY
+THURSDAY
+FRIDAY
+SATURDAY
+SUNDAY
+
+HOLIDAY DATE MAPPING
+
+Considera le seguenti espressioni equivalenti per le festività, e mappa ciascuna di esse alla data corrispondente:
+
+Christmas Eve:
+- Christmas Eve
+- Christmas eve
+- December 24
+- 24 December
+- 24th December
+-> 2025-12-24
+
+Christmas:
+- Christmas
+- Christmas Day
+- December 25
+- 25 December
+- 25th December
+-> 2025-12-25
+
+St. Stephen's Day:
+- St. Stephen's Day
+- Saint Stephen's Day
+- Santo Stefano
+- December 26
+- 26 December
+- 26th December
+-> 2025-12-26
+
+New Year's Eve:
+- New Year's Eve
+- New Years Eve
+- December 31
+- 31 December
+- 31st December
+-> 2025-12-31
+
+New Year's Day:
+- New Year's Day
+- New Year
+- January 1
+- 1 January
+- 1st January
+-> 2026-01-01
+
+Se un lavoratore dichiara di non voler lavorare in una festività,
+inserisci la data corrispondente in unavailable_dates.
+
+Restituisci esclusivamente dati conformi allo schema.
+
+Se un'informazione non è presente usa null oppure [].
+""",
+        ),
+        ("user", "{text}"),
+    ]
+)
+
+# =====================================================
+# OLLAMA
+# =====================================================
+
+llm = ChatOllama(model="llama3.1:8b", temperature=0).with_structured_output(
+    PreferencesFile
+)
+
+
+# =====================================================
+# FUNZIONE ESTRAZIONE
+# =====================================================
+
+
+def extract_preferences(text: str):
 
     chain = prompt | llm
 
-    print("Sto facendo ragionare l'agente sulle preferenze...")
-    risposta = chain.invoke({"testo": testo})
+    result = chain.invoke({"text": text})
+
+    return result
 
 
-    try:
-        # Convertiamo la stringa JSON in una vera Lista di Dizionari Python
-        dati_strutturati = json.loads(risposta.content)
-        return dati_strutturati
-    except json.JSONDecodeError:
-        return "Errore: Il modello non ha generato un JSON valido."
+def main():
 
+    with open("../preferenze.txt", "r") as f:
+        text = f.read()
+
+    preferences = extract_preferences(text)
+    print(preferences.model_dump_json(indent=4))
+    
 if __name__ == "__main__":
-    
-    risultato = estrai_preferenze_langchain("prova2.txt", nome_modello="llama3.1:8b")
-    
-    # Stampiamo il risultato ben formattato
-    print("\nEstrazione completata!")
-    print(json.dumps(risultato, indent=2))
+    main()

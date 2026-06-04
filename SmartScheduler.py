@@ -1,10 +1,11 @@
 from ortools.sat.python import cp_model
 from config import *
+from LLM_constraints import *
 
 
 def worker_scheduling(lavoratori, giorni, turni):
     model = cp_model.CpModel()
-
+    
     shifts = {}
 
     # Griglia dei turni: vale 1 se il lavoratore l lavora nel giorno g al turno t.
@@ -64,7 +65,16 @@ def worker_scheduling(lavoratori, giorni, turni):
             model.add(
                 sum(shifts[(l, g, t)] for g in w for t in range(turni)) <= len(w) - 1
             )
-
+    termini_obiettivo = add_preferences(
+        model=model,
+        shifts=shifts,
+        lavoratori=lavoratori,
+        giorni_totali=giorni,
+        turni_totali=turni,
+        DAYS_LIST=DAYS 
+    )
+    if termini_obiettivo:
+        model.Maximize(sum(termini_obiettivo))
     solver = cp_model.CpSolver()
     status = solver.solve(model)
 

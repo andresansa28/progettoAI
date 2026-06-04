@@ -1,0 +1,55 @@
+SMARTSCHEDULER - WORKERS PREFERENCES DATASET
+
+Worker 0
+
+I prefer working morning shifts. If possible, I would like Monday to be my day off. I find night shifts and Christmas Day particularly inconvenient.
+
+Worker 1
+
+I usually prefer afternoon shifts. If I could choose, I would like Friday to be my day off. Night shifts are not my favorite and I would rather avoid them whenever possible.
+
+Worker 2
+
+I enjoy working night shifts. My preferred day off is Sunday. I would prefer not to work on New Year's Eve.
+
+Worker 3
+
+I prefer morning shifts. I would like Saturday to be my day off. Night shifts and holiday duties during Christmas and New Year are inconvenient for me.
+
+Worker 4
+
+I generally prefer afternoon shifts. Wednesday would be my preferred day off. I would rather avoid night shifts whenever possible.
+
+Worker 5
+
+Morning shifts fit my schedule best. I would like Saturday as my day off. Night shifts and New Year's Day are particularly inconvenient for me.
+
+Worker 6
+
+I am most comfortable with night shifts. If possible, I would like Tuesday to be my day off. Working on Christmas Day would be inconvenient for me.
+
+Worker 7
+
+I usually prefer afternoon shifts. My preferred day off is Thursday. I would like to avoid night shifts, Christmas Day and Saint Stephen's Day whenever possible.
+
+Worker 8
+
+Morning shifts are my preferred option. I would like Sunday to be my day off. Night shifts are difficult for me and I would rather avoid them.
+
+Worker 9
+
+I prefer afternoon shifts. Monday would be my preferred day off. I would like to avoid working on Christmas Eve and New Year's Eve.
+
+Worker 10
+
+Afternoon shifts suit me best. If possible, I would like Friday to be my day off. Christmas Eve and New Year's Eve are the shifts I would most like to avoid.
+
+Worker 11
+
+I prefer morning shifts because they fit better with my personal schedule. If possible, I would like Thursday to be my day off. I find night shifts and New Year's Day particularly inconvenient.
+
+Worker 12
+
+I generally prefer afternoon shifts. My preferred day off is Tuesday. I would like to avoid working on Christmas Eve and Christmas Day whenever possible.
+
+
