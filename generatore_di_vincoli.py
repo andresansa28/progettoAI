@@ -1,12 +1,5 @@
-import os
-from langchain_google_genai import ChatGoogleGenerativeAI
-from pydantic import BaseModel
+from langchain_openai import ChatOpenAI
 
-
-os.environ["GOOGLE_API_KEY"] = "inserire chiave"
-
-class ConstraintsFile(BaseModel):
-    python_code: str
 
 with open("SmartScheduler.py", "r", encoding="utf-8") as f:
     scheduler_code = f.read()
@@ -16,7 +9,7 @@ with open("config.py", "r", encoding="utf-8") as f:
 
 with open("preferences.json", "r", encoding="utf-8") as f:
     preferences_json = f.read()
-    
+
 prompt = f"""
 Sei un Senior Python Engineer specializzato in Google OR-Tools.
 
@@ -45,22 +38,24 @@ def add_preferences(model, shifts, lavoratori, giorni_totali, turni_totali, DAYS
     
     return objective_terms"""
 
+
 def generate_constraints():
-    
-    llm = ChatGoogleGenerativeAI(
-        model="gemini-3.5-flash", 
-        temperature=0.0  
+
+    llm = ChatOpenAI(
+        model="nvidia/nemotron-3-ultra-550b-a55b:free",
+        base_url="https://openrouter.ai/api/v1", 
+        api_key="inserire-chiave-openrouter",
+        temperature=0,  
     )
 
     print("Generazione dei vincoli in corso")
-    
+
     try:
         result = llm.invoke(prompt)
-        
+
         # --- INIZIO FIX PER GEMINI ---
         contenuto = result.content
-        
-        # Controlliamo se Gemini ha restituito una lista di blocchi
+
         if isinstance(contenuto, list):
             # Estraiamo il testo dal primo blocco della lista
             testo_grezzo = contenuto[0].get("text", "")
@@ -68,20 +63,26 @@ def generate_constraints():
             # Se è già una normale stringa, la teniamo così
             testo_grezzo = contenuto
         # --- FINE FIX ---
-            
+
         # Ora facciamo la pulizia in totale sicurezza sulla stringa estratta
-        codice = testo_grezzo.replace("```python\n", "").replace("```python", "").replace("```", "").strip()
-        
+        codice = (
+            testo_grezzo.replace("```python\n", "")
+            .replace("```python", "")
+            .replace("```", "")
+            .strip()
+        )
+
         # Creazione fisica del file
-        with open("LLM_constraints.py", "w", encoding="utf-8") as f: 
+        with open("LLM_constraints.py", "w", encoding="utf-8") as f:
             f.write(codice)
-            
-        print("SUCCESSO ASSOLUTO! Vincoli perfetti generati nel file 'LLM_constraints.py'!")
-        
+
+        print(
+            "SUCCESSO ASSOLUTO! Vincoli perfetti generati nel file 'LLM_constraints.py'!"
+        )
+
     except Exception as e:
         print(f"ERRORE durante la generazione: {e}")
 
+
 if __name__ == "__main__":
     generate_constraints()
-
-
