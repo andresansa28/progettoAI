@@ -1,11 +1,11 @@
 from ortools.sat.python import cp_model
-from config import *
 from LLM_constraints import *
+from config import *
 
 
 def worker_scheduling(lavoratori, giorni, turni):
     model = cp_model.CpModel()
-    
+
     shifts = {}
 
     # Griglia dei turni: vale 1 se il lavoratore l lavora nel giorno g al turno t.
@@ -29,22 +29,19 @@ def worker_scheduling(lavoratori, giorni, turni):
 
     # Dopo ogni turno di notte, il lavoratore deve avere 2 giorni di riposo
     for l in range(lavoratori):
-        for g in range(giorni - REST_DAYS_AFTER_NIGHT):
+        for g in range(giorni):
             for r in range(1, REST_DAYS_AFTER_NIGHT + 1):
-                for t in range(turni):
-                    model.add(shifts[(l, g + r, t)] == 0).only_enforce_if(
-                        shifts[(l, g, NIGHT)]
-                    )
+                if g + r < giorni:  # Controllo per evitare di uscire dai limiti
+                    for t in range(turni):
+                        model.add(shifts[(l, g + r, t)] == 0).only_enforce_if(
+                            shifts[(l, g, NIGHT)]
+                        )
 
     # Ogni lavoratore non deve superare le 36 ore settimanali.
     for l in range(lavoratori):
         for w in WEEKS:
             model.add(
-                sum(
-                    shifts[(l, g, t)] * SHIFT_HOURS[t]
-                    for g in w
-                    for t in range(turni)
-                )
+                sum(shifts[(l, g, t)] * SHIFT_HOURS[t] for g in w for t in range(turni))
                 <= MAX_HOURS_PER_WEEK
             )
 
@@ -65,17 +62,18 @@ def worker_scheduling(lavoratori, giorni, turni):
             model.add(
                 sum(shifts[(l, g, t)] for g in w for t in range(turni)) <= len(w) - 1
             )
+
     termini_obiettivo = add_preferences(
         model=model,
         shifts=shifts,
         lavoratori=lavoratori,
         giorni_totali=giorni,
         turni_totali=turni,
-        DAYS_LIST=DAYS 
+        DAYS_LIST=DAYS,
     )
     if termini_obiettivo:
         model.Maximize(sum(termini_obiettivo))
     solver = cp_model.CpSolver()
     status = solver.solve(model)
 
-    return status, solver, shifts
+    return status, solver, shifts, termini_obiettivo

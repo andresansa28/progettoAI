@@ -44,7 +44,7 @@ def generate_constraints():
     llm = ChatOpenAI(
         model="nvidia/nemotron-3-ultra-550b-a55b:free",
         base_url="https://openrouter.ai/api/v1", 
-        api_key="inserire-chiave-openrouter",
+        api_key="inserire-chiave",
         temperature=0,  
     )
 

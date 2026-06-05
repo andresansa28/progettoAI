@@ -13,3 +13,4 @@ wheels/
 uv.lock
 pyproject.toml
 .python-version
+calendario_turni_1.xlsx
