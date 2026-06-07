@@ -11,7 +11,7 @@ with open("preferences.json", "r", encoding="utf-8") as f:
     preferences_json = f.read()
 
 prompt = f"""
-Sei un Senio Python Engineer specializzato in Google OR-Tools.
+Sei un Senior Python Engineer specializzato in Google OR-Tools.
 
 Qui c'è il codice del mio scheduler principale (SOLO PER CONTESTO, per farti capire le variabili in gioco):
 {scheduler_code}
