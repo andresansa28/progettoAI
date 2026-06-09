@@ -5,35 +5,55 @@ from util import print_schedule_terminal
 from hard_constraint_verifier import HardConstraintVerifier
 import sys
 
+
+MAX_ATTEMPTS = 5
+
 def main():
     # file_txt_preferenze = "preferenze.txt"
     # parse(file_txt_preferenze)
 
-    # file_json_preferenze = "preferences1.json"
-    # generate_constraints(file_json_preferenze)
+    file_json_preferenze = "preferences1.json"
+    generate_constraints(file_json_preferenze)
 
-    # generate_schedule_draft()
+    generate_schedule_draft()  # una sola volta all'inizio
 
-    # #va a recuperare il file appena creato dalla funzione precedente
-    # if 'schedule_draft_model' in sys.modules:
-    #     del sys.modules['schedule_draft_model']
-        
-    try:
-        import schedule_draft_model #anche se all'inizio segnale che il modulo non esiste, lanciate comunque il main che durante l'esecuizone il file si crea e poi lo importa in automatico
-        
-        
-        print("\nEsecuzione della bozza LLM...")
-        status, solver, shifts, worker_satisfaction = schedule_draft_model.solve_shift_scheduling()
-        print(status)
-        print_schedule_terminal(solver,shifts,13,31)
+
+    attempt = 0
+
+    while attempt < MAX_ATTEMPTS:
+
+        if "schedule_draft_model" in sys.modules:
+            del sys.modules["schedule_draft_model"]
+
+        import schedule_draft_model
+        import importlib
+
+        importlib.reload(schedule_draft_model)
+
+        status, solver, shifts, worker_satisfaction = (
+            schedule_draft_model.solve_shift_scheduling()
+        )
+
         verificatore = HardConstraintVerifier(solver, shifts, 13, 31, 3)
-        print(verificatore.verify_all_constraints())
-        
-        
-    except Exception as e:
-        print(f"Errore critico di esecuzione del modello LLM: {e}")
 
+        violations = verificatore.verify_all_constraints()
+
+        if not violations:
+
+            print("Tutti i vincoli HARD sono rispettati!")
+            print_schedule_terminal(solver, shifts, 13, 31)
+            break
+
+            print("Violazioni rilevate:")
+            for v in violations:
+                print(v)
+
+            attempt += 1
+
+            print(f"\nRigenerazione modello - tentativo {attempt}")
+
+            generate_schedule_draft(violations)
+            
+        else:
+            print("Numero massimo di tentativi raggiunto.")
 main()
-
-
-

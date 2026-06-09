@@ -3,11 +3,14 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-def generate_schedule_draft():
+
+def generate_schedule_draft(violations=None):
     print("Avvio Drafting Agent")
 
-    os.environ["GOOGLE_API_KEY"] = "inserire-chiave-aiGoogleStudio"
-    
+    os.environ["GOOGLE_API_KEY"] = (
+        "chiave_api"
+    )
+
     try:
         llm = ChatGoogleGenerativeAI(
             model="gemini-3.5-flash",
@@ -17,7 +20,7 @@ def generate_schedule_draft():
         print(f"Errore nell'inizializzazione di Gemini: {e}")
         return
 
-    #vincoli dettati dalla traccia, eventualemtne li mettiamo in un file a parte o laciamo cosi, vediamo
+    # vincoli dettati dalla traccia, eventualemtne li mettiamo in un file a parte o laciamo cosi, vediamo
     hospital_rules = """
     REGOLE GENERALI (DA RISPETTARE TASSATIVAMENTE NELLA COSTRUZIONE DEL MODELLO):
     1. Orizzonte temporale: Dal 7 Dicembre 2026 al 6 Gennaio 2027 (31 giorni totali).
@@ -33,14 +36,29 @@ def generate_schedule_draft():
     - Ci sono 13 lavoratori in totale, indici da 0 a 12.
     - Almeno 2 lavoratori devono essere assegnati a ogni turno.
     """
+    violations_list = ""
 
-   
+    if violations:
+        violations_list = f"""
+    ATTENZIONE: IL MODELLO PRECEDENTE NON ERA VALIDO.
+
+    VINCOLI HARD VIOLATI:
+
+    {chr(10).join("- " + v for v in violations)}
+
+    Devi correggere esplicitamente questi errori.
+    Prima di generare il codice, analizza le cause delle violazioni e rafforza i vincoli OR-Tools necessari affinché non possano più verificarsi.
+    """
+
     prompt_template = ChatPromptTemplate.from_template("""
 Sei un Senior Python Engineer specializzato in Google OR-Tools (CP-SAT Solver).
 Devi generare uno script Python eseguibile che produca un calendario ospedaliero bilanciato.
 
 REGOLE E VINCOLI HARD DELL'OSPEDALE:
 {hospital_rules}
+
+VIOLAZIONI RILEVATE NEL MODELLO PRECEDENTE (se presenti):
+{violations_list}
 
 Assumi che esista un modulo chiamato `LLM_constraints.py` nella stessa directory.
 Questo modulo contiene le seguenti variabili: `UNAVAILABLE_DATES` (dizionario con liste di stringhe come "YYYY-MM-DD"), `PREFERRED_SHIFTS`, `PREFERRED_DAYS_OFF`, `DISLIKED_SHIFTS` e la funzione `evaluate_worker_satisfaction(worker_id, assigned_shifts_list, assigned_days_off_list)`.
@@ -108,22 +126,30 @@ if __name__ == '__main__':
 """)
     print("Invocazione di Gemini 3.5 Flash")
 
-    try: #questo try serve per formattare pe rbene la risposta generata da gemini altrimenti può contenere altre info inutli
+    try:  # questo try serve per formattare pe rbene la risposta generata da gemini altrimenti può contenere altre info inutli
         parser = StrOutputParser()
         chain = prompt_template | llm | parser
-        
+
         risultato_grezzo = chain.invoke({"hospital_rules": hospital_rules})
-        
-        codice_pulito = risultato_grezzo.replace("```python\n", "").replace("```python", "").replace("```", "").strip()
+
+        codice_pulito = (
+            risultato_grezzo.replace("```python\n", "")
+            .replace("```python", "")
+            .replace("```", "")
+            .strip()
+        )
 
         output_filename = "schedule_draft_model.py"
         with open(output_filename, "w", encoding="utf-8") as f:
             f.write(codice_pulito)
-            
-        print(f"SUCCESSO! Il file '{output_filename}' è stato generato e contiene la bozza del calendario.")
+
+        print(
+            f"SUCCESSO! Il file '{output_filename}' è stato generato e contiene la bozza del calendario."
+        )
 
     except Exception as e:
         print(f"ERRORE durante la generazione: {e}")
+
 
 if __name__ == "__main__":
     generate_schedule_draft()

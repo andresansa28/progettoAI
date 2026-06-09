@@ -141,7 +141,4 @@ class HardConstraintVerifier:
         errors.extend(self.verify_max_hours_per_week())
         errors.extend(self.verify_min_days_off_per_week())
 
-        if not errors:
-            return "Tutti i vincoli HARD sono rispettati!"
-        else:
-            return "\n\n".join(errors)
+        return errors
