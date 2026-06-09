@@ -3,6 +3,7 @@ from worker_agent import generate_constraints
 from drafting_agent import generate_schedule_draft
 from util import print_schedule_terminal
 from hard_constraint_verifier import HardConstraintVerifier
+from calcola_fairness import calcola_fairness_dizionario
 import sys
 
 
@@ -43,6 +44,16 @@ def main():
 
             print("Tutti i vincoli HARD sono rispettati!")
             print_schedule_terminal(solver, shifts, 13, 31)
+
+            fairness_dict = calcola_fairness_dizionario(solver, shifts, 13, 31)
+            
+            print("Dizionario Fairness Punteggi:")
+            for w, score in fairness_dict.items():
+                print(f" Worker {w}: {score} punti")
+                
+            # Estrazione del lavoratore più svantaggiato
+            lavoratore_peggiore = min(fairness_dict, key=fairness_dict.get)
+            punteggio_peggiore = fairness_dict[lavoratore_peggiore] #da utilizzare probabilente nella fase 4 per migliorare il suo pubtegguoi
             break
 
         print("Violazioni rilevate:")
