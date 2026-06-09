@@ -33,6 +33,7 @@ def main():
         status, solver, shifts, worker_satisfaction = (
             schedule_draft_model.solve_shift_scheduling()
         )
+        print(status)
 
         verificatore = HardConstraintVerifier(solver, shifts, 13, 31, 3)
 
@@ -44,16 +45,16 @@ def main():
             print_schedule_terminal(solver, shifts, 13, 31)
             break
 
-            print("Violazioni rilevate:")
-            for v in violations:
-                print(v)
+        print("Violazioni rilevate:")
+        for v in violations:
+            print(v)
 
-            attempt += 1
+        attempt += 1
 
-            print(f"\nRigenerazione modello - tentativo {attempt}")
+        print(f"\nRigenerazione modello - tentativo {attempt}")
 
-            generate_schedule_draft(violations)
+        generate_schedule_draft(violations)
             
-        else:
+    else:
             print("Numero massimo di tentativi raggiunto.")
 main()
