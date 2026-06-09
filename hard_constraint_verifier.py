@@ -86,23 +86,30 @@ class HardConstraintVerifier:
                 )
         return max_shifts_errors
 
-    # Veirfica che il lavoratore non superi le 36 ore settimanali
+    # Verifica che il lavoratore non superi le 36 ore settimanali
     def verify_max_hours_per_week(self):
 
         max_hours_errors = []
 
         for l in range(self.lavoratori):
-            for w in WEEKS:
+
+            # tutte le finestre mobili di 7 giorni
+            for start_day in range(self.giorni - 6):
+
                 total_hours = sum(
                     self.solver.Value(self.shifts[(l, g, t)]) * SHIFT_HOURS[t]
-                    for g in w
+                    for g in range(start_day, start_day + 7)
                     for t in range(self.turni)
                 )
 
                 if total_hours > MAX_HOURS_PER_WEEK:
                     max_hours_errors.append(
-                        f"Vincolo violato: Il lavoratore {l} è assegnato a {total_hours} ore nella settimana che include i giorni {w} (massimo consentito: {MAX_HOURS_PER_WEEK} ore)"
+                        f"Vincolo violato: Il lavoratore {l} "
+                        f"è assegnato a {total_hours} ore "
+                        f"nella finestra {start_day}-{start_day + 6} "
+                        f"(massimo consentito: {MAX_HOURS_PER_WEEK} ore)"
                     )
+
         return max_hours_errors
 
     # Verifica che ogni lavoratore abbia almeno un giorno libero a settimana
@@ -111,16 +118,16 @@ class HardConstraintVerifier:
         min_days_off_errors = []
 
         for l in range(self.lavoratori):
-            for w in WEEKS:
+            for start_day in range(self.giorni - 6):
                 total_shifts_in_week = sum(
                     self.solver.Value(self.shifts[(l, g, t)])
-                    for g in w
+                    for g in range(start_day, start_day + 7)
                     for t in range(self.turni)
                 )
 
-                if total_shifts_in_week > len(w) - 1:
+                if total_shifts_in_week > len(range(start_day, start_day + 7)) - 1:
                     min_days_off_errors.append(
-                        f"Vincolo violato: Il lavoratore {l} è assegnato a {total_shifts_in_week} turni nella settimana che include i giorni {w} (deve avere almeno un giorno libero)"
+                        f"Vincolo violato: Il lavoratore {l} è assegnato a {total_shifts_in_week} turni nella settimana che include i giorni {start_day}-{start_day + 6} (deve avere almeno un giorno libero)"
                     )
         return min_days_off_errors
 

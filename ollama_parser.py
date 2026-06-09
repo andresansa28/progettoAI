@@ -151,13 +151,16 @@ def extract_preferences(text: str):
     return result
 
 
-def main():
+def parse(path_file):
 
-    with open("../preferenze.txt", "r") as f:
+    with open(path_file, "r") as f:
         text = f.read()
 
+    print("Lettura file testule in corso")
     preferences = extract_preferences(text)
-    print(preferences.model_dump_json(indent=4))
+    # print(preferences.model_dump_json(indent=4))
+    # Creazione fisica del file
+    with open("preferences1.json", "w", encoding="utf-8") as f:
+        f.write(preferences.model_dump_json(indent=4))
+        print("Json creato correttamente")
     
-if __name__ == "__main__":
-    main()

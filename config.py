@@ -4,22 +4,6 @@ from datetime import date, timedelta
 START_DATE = date(2026, 12, 7)
 END_DATE = date(2027, 1, 6)
 
-DAYS = []
-
-current = START_DATE
-
-while current <= END_DATE:
-    DAYS.append(current)
-    current += timedelta(days=1)
-    
-WEEKS = []
-
-#range(inizio, fine, passo)
-for start in range(0, len(DAYS), 7): 
-    week = list(range(start, min(start + 7, len(DAYS))))
-    WEEKS.append(week)
-    
-
 # Turni
 MORNING = 0
 AFTERNOON = 1

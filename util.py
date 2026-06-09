@@ -1,29 +1,54 @@
-def stampa_calendario(solver, shifts, lavoratori, giorni, turni):
+from datetime import date, timedelta
+
+def print_schedule_terminal(solver, shifts, lavoratori, giorni):
     """
-    Stampa il calendario in un formato tabellare pulito e leggibile.
+    Stampa il calendario in formato tabellare nel terminale.
+    Richiede gli oggetti solver e shifts restituiti da OR-Tools.
     """
-    # Mappiamo gli indici dei turni a nomi leggibili
-    nomi_turni = {0: "Mattina", 1: "Pomeriggio", 2: "Notte"}
+    MORNING = 0
+    AFTERNOON = 1
+    NIGHT = 2
     
-    print("\n" + "="*50)
-    print("TABELLONE TURNI OSPEDALIERO")
-    print("="*50)
-
+    start_date = date(2026, 12, 7)
+    
+    print("\n" + "="*88)
+    print(" CALENDARIO OSPEDALIERO (7 Dic. 2026 - 6 Gen. 2027) ".center(88))
+    print("="*88 + "\n")
+    
+    # --- 1. Costruzione dell'intestazione (Giorni del mese) ---
+    header = f"{'Lav/Gio ':<9}|"
     for g in range(giorni):
-        print(f"\nGIORNO {g + 1}")
-        print("-" * 30)
+        current_date = start_date + timedelta(days=g)
+        header += f" {current_date.strftime('%d')}"
+    header += " | Ore | TurniEq"
+    
+    print(header)
+    print("-" * len(header))
+    
+    for l in range(lavoratori):
+        row_str = f"Worker {l:<2} |"
+        ore_totali = 0
+        turni_eq = 0
         
-        for t in range(turni):
-            assegnati = [
-                f"L{l}" for l in range(lavoratori) 
-                if solver.Value(shifts[(l, g, t)]) == 1
-            ]
+        for g in range(giorni):
+            assigned_shift = "-"  # Default: giorno libero
             
-            nome_turno = nomi_turni.get(t, f"Turno {t}")
-            lavoratori_str = ", ".join(assegnati) if assegnati else "Nessuno"
+            if solver.Value(shifts[(l, g, MORNING)]) == 1:
+                assigned_shift = "M"
+                ore_totali += 6
+                turni_eq += 1
+            elif solver.Value(shifts[(l, g, AFTERNOON)]) == 1:
+                assigned_shift = "A"
+                ore_totali += 6
+                turni_eq += 1
+            elif solver.Value(shifts[(l, g, NIGHT)]) == 1:
+                assigned_shift = "N"
+                ore_totali += 12
+                turni_eq += 2
+                
+            row_str += f" {assigned_shift:>2}"
             
-            print(f"  {nome_turno:<12} | {lavoratori_str}")
-            
-    print("\n" + "="*50)
-
-
+        row_str += f" | {ore_totali:>3} | {turni_eq:>7}"
+        print(row_str)
+        
+    print("-" * len(header) + "\n")

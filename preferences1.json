@@ -1,5 +1,5 @@
 {
-    "preferences": [
+    "workers": [
         {
             "worker_id": 0,
             "preferred_shift": "MORNING",
