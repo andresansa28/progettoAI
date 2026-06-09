@@ -130,7 +130,7 @@ if __name__ == '__main__':
         parser = StrOutputParser()
         chain = prompt_template | llm | parser
 
-        risultato_grezzo = chain.invoke({"hospital_rules": hospital_rules})
+        risultato_grezzo = chain.invoke({"hospital_rules": hospital_rules, "violations_list": violations_list})
 
         codice_pulito = (
             risultato_grezzo.replace("```python\n", "")
