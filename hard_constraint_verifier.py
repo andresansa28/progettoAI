@@ -94,11 +94,12 @@ class HardConstraintVerifier:
         for l in range(self.lavoratori):
 
             # tutte le finestre mobili di 7 giorni
-            for start_day in range(self.giorni - 6):
+            for start_day in range(0,self.giorni,7):
+                end_day = min(start_day+7,self.giorni)
 
                 total_hours = sum(
                     self.solver.Value(self.shifts[(l, g, t)]) * SHIFT_HOURS[t]
-                    for g in range(start_day, start_day + 7)
+                    for g in range(start_day, end_day)
                     for t in range(self.turni)
                 )
 
@@ -112,22 +113,33 @@ class HardConstraintVerifier:
 
         return max_hours_errors
 
+    
     # Verifica che ogni lavoratore abbia almeno un giorno libero a settimana
     def verify_min_days_off_per_week(self):
 
         min_days_off_errors = []
 
         for l in range(self.lavoratori):
-            for start_day in range(self.giorni - 6):
+            for start_day in range(0, self.giorni, 7):
+                # Limita l'ultimo giorno della settimana a self.giorni
+                end_day = min(start_day + 7, self.giorni)
+                
                 total_shifts_in_week = sum(
                     self.solver.Value(self.shifts[(l, g, t)])
-                    for g in range(start_day, start_day + 7)
+                    for g in range(start_day, end_day)
                     for t in range(self.turni)
                 )
 
-                if total_shifts_in_week > len(range(start_day, start_day + 7)) - 1:
+                # Calcola la lunghezza reale della finestra (potrebbe essere < 7 a fine mese)
+                window_length = end_day - start_day
+                if window_length != 7:
+                    continue
+                # Deve esserci almeno 1 giorno libero nella finestra considerata
+                if total_shifts_in_week > window_length - 1:
                     min_days_off_errors.append(
-                        f"Vincolo violato: Il lavoratore {l} è assegnato a {total_shifts_in_week} turni nella settimana che include i giorni {start_day}-{start_day + 6} (deve avere almeno un giorno libero)"
+                        f"Vincolo violato: Il lavoratore {l} è assegnato a {total_shifts_in_week} "
+                        f"turni nella finestra che include i giorni {start_day}-{end_day - 1} "
+                        f"(deve avere almeno un giorno libero)"
                     )
         return min_days_off_errors
 

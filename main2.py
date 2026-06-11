@@ -34,7 +34,7 @@ def main():
         status, solver, shifts, worker_satisfaction = (
             schedule_draft_model.solve_shift_scheduling()
         )
-        print(status)
+        print_schedule_terminal(solver,shifts,13,31)
 
         verificatore = HardConstraintVerifier(solver, shifts, 13, 31, 3)
 
@@ -43,8 +43,7 @@ def main():
         if not violations:
 
             print("Tutti i vincoli HARD sono rispettati!")
-            print_schedule_terminal(solver, shifts, 13, 31)
-
+            
             fairness_dict = calcola_fairness_dizionario(solver, shifts, 13, 31)
             
             print("Dizionario Fairness Punteggi:")

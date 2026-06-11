@@ -1,10 +1,11 @@
 from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_ollama import ChatOllama
 import os
 
 
 
-os.environ["GOOGLE_API_KEY"] = "inserire-chiave-aiStudioGoogle"
+os.environ["GOOGLE_API_KEY"] = "chiave"
 
 def generate_constraints(file_json):
 
@@ -59,15 +60,17 @@ def generate_constraints(file_json):
         return score
 
     """
-
+    #llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
     # llm = ChatOpenAI(
-    #     model="openai/gpt-oss-120b",
+    #     model="poolside/laguna-m.1:free",
     #     base_url="https://openrouter.ai/api/v1", 
-    #     api_key="inserire-chiave",
+    #     api_key="chiave",
     #     temperature=0,  
     # )
     llm = ChatGoogleGenerativeAI(
-        model = "gemini-3.5-flash")
+            model="gemini-3.1-flash-lite",
+            temperature=0,
+        )
     
     print("Generazione dei vincoli in corso")
 
