@@ -5,7 +5,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_ollama import ChatOllama
 
 
-def generate_schedule_draft(violations=None):
+def generate_schedule_draft(violations=None, previous_code=""):
     print("Avvio Drafting Agent")
 
     os.environ["GOOGLE_API_KEY"] = (
@@ -13,7 +13,7 @@ def generate_schedule_draft(violations=None):
     )
 
     try:
-        #llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
+        # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
         llm = ChatGoogleGenerativeAI(
             model="gemini-3.1-flash-lite",
             temperature=0,
@@ -52,12 +52,22 @@ def generate_schedule_draft(violations=None):
     Prima di generare il codice, analizza le cause delle violazioni e rafforza i vincoli OR-Tools necessari affinché non possano più verificarsi.
     """
 
+    if previous_code:
+        vecchio_codice = (
+            "\n\nCODICE PRECEDENTE GENERATO (da analizzare e migliorare):\n"
+            + previous_code
+        )
+
     prompt_template = ChatPromptTemplate.from_template("""
 Sei un Senior Python Engineer specializzato in Google OR-Tools (CP-SAT Solver).
 Devi generare uno script Python eseguibile che produca un calendario ospedaliero bilanciato.
 
 REGOLE E VINCOLI HARD DELL'OSPEDALE (IL TESTO LUNGO):
 {hospital_rules}
+
+VECCHIO CODICE GENERATO (SE PRESENTE):
+{vecchio_codice}
+
 VIOLAZIONI DEL MODELLO RECENTE (SE PRESENTI)
 {violations_list}
 
@@ -149,7 +159,9 @@ if __name__ == '__main__':
         parser = StrOutputParser()
         chain = prompt_template | llm | parser
 
-        risultato_grezzo = chain.invoke({"hospital_rules": hospital_rules, "violations_list": violations_list})
+        risultato_grezzo = chain.invoke(
+            {"hospital_rules": hospital_rules, "violations_list": violations_list, "vecchio_codice": previous_code}
+        )
 
         codice_pulito = (
             risultato_grezzo.replace("```python\n", "")
