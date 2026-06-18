@@ -1,4 +1,4 @@
-import LLM_constraints #se da errore all'inizio è eprche il file ancora non esiste ma dop l'agente lo genreea (sio speera)
+import LLM_constraints 
 from datetime import date, timedelta
 
 def calcola_fairness_dizionario(solver, shifts, num_workers, num_days):
@@ -13,21 +13,20 @@ def calcola_fairness_dizionario(solver, shifts, num_workers, num_days):
         
         for g in range(num_days):
             current_date = start_date + timedelta(days=g)
-            date_str = current_date.strftime("%Y-%m-%d")
             day_name = current_date.strftime("%A").upper()
             
             lavorato_oggi = False
             for t in range(3):
+                # Se il modello va in eccezione qui, significa che è INFEASIBLE
                 if solver.Value(shifts[(w, g, t)]) == 1:
-                    # Crea la tupla (data, tipo_turno) come richiesto da LLM_constraints
-                    assigned_shifts_list.append((date_str, shift_names[t]))
+                    # PASSIAMO LA STRINGA ESATTA, COSÌ LLM_CONSTRAINTS LA LEGGE BENE
+                    assigned_shifts_list.append(shift_names[t])
                     lavorato_oggi = True
             
             if not lavorato_oggi:
                 assigned_days_off_list.append(day_name)
                 
-       #Funzione pres a da LLm costraint che genera l'agente nella fase 2, serve appunto per calcoalre il punteggio di ognoi lavoratore in base
-       #ai punti che assegna lui nel codice quando lo genrea
+        # Calcolo punti sincronizzato al 100%
         score = LLM_constraints.evaluate_worker_satisfaction(w, assigned_shifts_list, assigned_days_off_list)
         fairness_dict[w] = score
         
