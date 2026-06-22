@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
+from dotenv import load_dotenv
 
 # =====================================================
 # SCHEMA JSON
@@ -138,9 +139,9 @@ Se un'informazione non è presente usa null oppure [].
 #     PreferencesFile
 # )
 
-os.environ["GOOGLE_API_KEY"] = (
-        "chiave"
-    )
+load_dotenv()
+google_key = os.getenv("GOOGLE_API_KEY")
+os.environ["GOOGLE_API_KEY"] = google_key
 
 try:
     # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
