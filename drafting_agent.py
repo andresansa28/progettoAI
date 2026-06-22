@@ -30,7 +30,7 @@ def generate_schedule_draft(violations=None, previous_code="", fairness_feedback
     3. Carico di lavoro: Mattina e Pomeriggio valgono 1 turno equivalente. La Notte vale 2 turni equivalenti.
     4. Ore massime (CRITICO): Max 36 ore (ossia 6 turni equivalenti) per SETTIMANA DI CALENDARIO. Valuta i blocchi fissi di 7 giorni (0-6, 7-13, 14-20, 21-27) e il blocco finale (28-30). NON usare la finestra mobile per le ore, usa un ciclo con step 7 (es. range(0, num_days, 7)).
     5. Totale turni mese (CRITICO): Ogni lavoratore deve coprire ESATTAMENTE 25 turni equivalenti nel mese (usa l'uguaglianza rigida == 25).
-    6. Regola Riposo Notturno: DUE giorni liberi consecutivi obbligatori dopo ogni turno di notte. (Usa l'if per controllare i limiti dell'array).
+    6. Regola Riposo Notturno: DUE giorni liberi consecutivi obbligatori dopo ogni turno di notte. (Usa l'if per controllare i limiti dell'array. CRITICO: Usa SOLO l'implicazione diretta, ovvero "se notte oggi, allora turni domani = 0", NON inserire MAI doppie implicazioni inverse o "logiche implicite").
     7. Limite giornaliero: Max 1 turno al giorno per lavoratore.
     8. Riposo settimanale: Almeno 1 giorno libero garantito per ogni settimana di calendario (valutato sugli stessi blocchi fissi di 7 giorni).
 
