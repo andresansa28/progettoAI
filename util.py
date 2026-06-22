@@ -16,7 +16,7 @@ def print_schedule_terminal(solver, shifts, lavoratori, giorni):
     print("="*88 + "\n")
     
     # --- 1. Costruzione dell'intestazione (Giorni del mese) ---
-    header = f"{'Lav/Gio ':<9}|"
+    header = f"{'Lav/Gio ':<10}|"
     for g in range(giorni):
         current_date = start_date + timedelta(days=g)
         header += f" {current_date.strftime('%d')}"
