@@ -1,7 +1,9 @@
 from typing import List, Optional
 
+import os
 from pydantic import BaseModel, Field
 from langchain_ollama import ChatOllama
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 
 # =====================================================
@@ -132,9 +134,22 @@ Se un'informazione non è presente usa null oppure [].
 # OLLAMA
 # =====================================================
 
-llm = ChatOllama(model="llama3.1:8b", temperature=0).with_structured_output(
-    PreferencesFile
-)
+# llm = ChatOllama(model="llama3.1:8b", temperature=0).with_structured_output(
+#     PreferencesFile
+# )
+
+os.environ["GOOGLE_API_KEY"] = (
+        "chiave"
+    )
+
+try:
+    # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-3.1-flash-lite",
+        temperature=0,
+    ).with_structured_output(PreferencesFile)
+except Exception as e:
+    print(f"Errore nell'inizializzazione di Gemini: {e}")
 
 
 # =====================================================

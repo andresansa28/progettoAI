@@ -15,7 +15,13 @@ UNAVAILABLE_DATES = {
     9: ["2025-12-24", "2025-12-31"],
     10: ["2025-12-24", "2025-12-31"],
     11: ["2026-01-01"],
-    12: ["2025-12-24", "2025-12-25"]
+    12: ["2025-12-24", "2025-12-25"],
+    13: ["2025-12-31"],
+    14: ["2025-12-24", "2025-12-25"],
+    15: ["2026-01-01"],
+    16: ["2025-12-26"],
+    17: ["2025-12-25"],
+    18: ["2025-12-31"]
 }
 
 # --- 2. SOFT CONSTRAINTS & WEIGHTS ---
@@ -24,19 +30,25 @@ PENALTY_DISLIKED_SHIFT = -10
 BONUS_DAY_OFF = 10
 
 WORKER_PREFS = {
-    0: {"shift": "MORNING", "day_off": "MONDAY", "disliked": ["NIGHT", "Christmas Day"]},
+    0: {"shift": "MORNING", "day_off": "MONDAY", "disliked": ["NIGHT"]},
     1: {"shift": "AFTERNOON", "day_off": "FRIDAY", "disliked": ["NIGHT"]},
     2: {"shift": "NIGHT", "day_off": "SUNDAY", "disliked": []},
-    3: {"shift": "MORNING", "day_off": "SATURDAY", "disliked": ["NIGHT", "Christmas Day", "New Year's Day"]},
-    4: {"shift": "AFTERNOON", "day_off": "WEDNESDAY", "disliked": ["NIGHT"]},
-    5: {"shift": "MORNING", "day_off": "SATURDAY", "disliked": ["NIGHT", "New Year's Day"]},
-    6: {"shift": "NIGHT", "day_off": "TUESDAY", "disliked": ["Christmas Day"]},
-    7: {"shift": "AFTERNOON", "day_off": "THURSDAY", "disliked": ["NIGHT", "Christmas Day", "St. Stephen's Day"]},
+    3: {"shift": "MORNING", "day_off": "SATURDAY", "disliked": ["NIGHT"]},
+    4: {"shift": "AFTERNOON", "day_off": None, "disliked": ["NIGHT"]},
+    5: {"shift": "MORNING", "day_off": "SATURDAY", "disliked": ["NIGHT"]},
+    6: {"shift": "NIGHT", "day_off": "TUESDAY", "disliked": []},
+    7: {"shift": "AFTERNOON", "day_off": "THURSDAY", "disliked": ["NIGHT"]},
     8: {"shift": "MORNING", "day_off": "SUNDAY", "disliked": ["NIGHT"]},
-    9: {"shift": "AFTERNOON", "day_off": "MONDAY", "disliked": ["Christmas Eve", "New Year's Eve"]},
-    10: {"shift": "AFTERNOON", "day_off": "FRIDAY", "disliked": ["Christmas Eve", "New Year's Eve"]},
-    11: {"shift": "MORNING", "day_off": "THURSDAY", "disliked": ["NIGHT", "New Year's Day"]},
-    12: {"shift": "AFTERNOON", "day_off": "TUESDAY", "disliked": ["Christmas Eve", "Christmas Day"]}
+    9: {"shift": "AFTERNOON", "day_off": "MONDAY", "disliked": []},
+    10: {"shift": "AFTERNOON", "day_off": "FRIDAY", "disliked": []},
+    11: {"shift": "MORNING", "day_off": "THURSDAY", "disliked": ["NIGHT"]},
+    12: {"shift": "AFTERNOON", "day_off": "TUESDAY", "disliked": []},
+    13: {"shift": "MORNING", "day_off": "SUNDAY", "disliked": ["NIGHT"]},
+    14: {"shift": "NIGHT", "day_off": None, "disliked": []},
+    15: {"shift": "AFTERNOON", "day_off": "SATURDAY", "disliked": ["MORNING"]},
+    16: {"shift": "MORNING", "day_off": "FRIDAY", "disliked": ["NIGHT"]},
+    17: {"shift": "AFTERNOON", "day_off": "MONDAY", "disliked": ["NIGHT"]},
+    18: {"shift": "NIGHT", "day_off": "THURSDAY", "disliked": ["MORNING"]}
 }
 
 # --- 3. PREFERENCE SCORING (Modello di Soddisfazione) ---
@@ -60,8 +72,9 @@ def evaluate_worker_satisfaction(worker_id, assigned_shifts_list, assigned_days_
             score += PENALTY_DISLIKED_SHIFT
             
     # Valutazione giorni di riposo
-    for day in assigned_days_off_list:
-        if day == prefs["day_off"]:
-            score += BONUS_DAY_OFF
-            
+    if prefs["day_off"]:
+        for day in assigned_days_off_list:
+            if day == prefs["day_off"]:
+                score += BONUS_DAY_OFF
+                
     return score

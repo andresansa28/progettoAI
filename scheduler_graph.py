@@ -104,7 +104,7 @@ def solver_node(state: SchedulerState):
     LAST_SOLVER = solver
     LAST_SHIFTS = shifts
 
-    print_schedule_terminal(solver, shifts, 13, 31)
+    print_schedule_terminal(solver, shifts, 19, 31)
 
     return {}
 
@@ -120,7 +120,7 @@ def verifier_node(state: SchedulerState):
 
     print("\n=== HARD CONSTRAINT VERIFIER ===")
 
-    verifier = HardConstraintVerifier(LAST_SOLVER, LAST_SHIFTS, 13, 31, 3)
+    verifier = HardConstraintVerifier(LAST_SOLVER, LAST_SHIFTS, 19, 31, 3)
     violations = verifier.verify_all_constraints()
 
     history = list(state.get("violation_history", []))
@@ -164,7 +164,7 @@ def fairness_node(state: SchedulerState):
     global LAST_SHIFTS
 
     print("\n=== FAIRNESS EVALUATION ===")
-    fairness = calcola_fairness_dizionario(LAST_SOLVER, LAST_SHIFTS, 13, 31)
+    fairness = calcola_fairness_dizionario(LAST_SOLVER, LAST_SHIFTS, 19, 31)
     
     fairness_ordinato = dict(sorted(fairness.items(), key=lambda item: item[1]))
     somma_fairness = 0

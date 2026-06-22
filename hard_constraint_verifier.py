@@ -13,21 +13,20 @@ class HardConstraintVerifier:
 
     # Verifica che ogni turno abbia almeno il numero minimo di lavoratori assegnati
     def verify_number_of_workers_per_shift(self):
-
         number_of_workers_errors = []
+        specialized_indices = range(13, 19) # ID degli specializzati
 
         for g in range(self.giorni):
             for t in range(self.turni):
-                assigned_workers = sum(
-                    self.solver.Value(self.shifts[(l, g, t)])
-                    for l in range(self.lavoratori)
-                )
+                # Totale lavoratori (devono essere almeno 3)
+                assigned_workers = sum(self.solver.Value(self.shifts[(l, g, t)]) for l in range(self.lavoratori))
+                # Totale specializzati (devono essere almeno 1)
+                spec_workers = sum(self.solver.Value(self.shifts[(l, g, t)]) for l in specialized_indices)
 
-                if assigned_workers < MIN_WORKERS_PER_SHIFT:
+                if assigned_workers < 3 or spec_workers < 1:
                     number_of_workers_errors.append(
-                        f"Giorno {g}, turno {t}: "
-                        f"{assigned_workers} lavoratori "
-                        f"(minimo {MIN_WORKERS_PER_SHIFT})"
+                        f"Giorno {g}, turno {t}: Totale assegnati={assigned_workers} (min 3), "
+                        f"di cui specializzati={spec_workers} (min 1)."
                     )
         return number_of_workers_errors
 

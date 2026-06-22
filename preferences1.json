@@ -5,8 +5,7 @@
             "preferred_shift": "MORNING",
             "preferred_day_off": "MONDAY",
             "disliked_shifts": [
-                "NIGHT",
-                "Christmas Day"
+                "NIGHT"
             ],
             "unavailable_dates": [
                 "2025-12-25"
@@ -35,9 +34,7 @@
             "preferred_shift": "MORNING",
             "preferred_day_off": "SATURDAY",
             "disliked_shifts": [
-                "NIGHT",
-                "Christmas Day",
-                "New Year's Day"
+                "NIGHT"
             ],
             "unavailable_dates": [
                 "2025-12-25",
@@ -47,7 +44,7 @@
         {
             "worker_id": 4,
             "preferred_shift": "AFTERNOON",
-            "preferred_day_off": "WEDNESDAY",
+            "preferred_day_off": null,
             "disliked_shifts": [
                 "NIGHT"
             ],
@@ -58,8 +55,7 @@
             "preferred_shift": "MORNING",
             "preferred_day_off": "SATURDAY",
             "disliked_shifts": [
-                "NIGHT",
-                "New Year's Day"
+                "NIGHT"
             ],
             "unavailable_dates": [
                 "2026-01-01"
@@ -69,9 +65,7 @@
             "worker_id": 6,
             "preferred_shift": "NIGHT",
             "preferred_day_off": "TUESDAY",
-            "disliked_shifts": [
-                "Christmas Day"
-            ],
+            "disliked_shifts": [],
             "unavailable_dates": [
                 "2025-12-25"
             ]
@@ -81,9 +75,7 @@
             "preferred_shift": "AFTERNOON",
             "preferred_day_off": "THURSDAY",
             "disliked_shifts": [
-                "NIGHT",
-                "Christmas Day",
-                "St. Stephen's Day"
+                "NIGHT"
             ],
             "unavailable_dates": [
                 "2025-12-25",
@@ -103,10 +95,7 @@
             "worker_id": 9,
             "preferred_shift": "AFTERNOON",
             "preferred_day_off": "MONDAY",
-            "disliked_shifts": [
-                "Christmas Eve",
-                "New Year's Eve"
-            ],
+            "disliked_shifts": [],
             "unavailable_dates": [
                 "2025-12-24",
                 "2025-12-31"
@@ -116,10 +105,7 @@
             "worker_id": 10,
             "preferred_shift": "AFTERNOON",
             "preferred_day_off": "FRIDAY",
-            "disliked_shifts": [
-                "Christmas Eve",
-                "New Year's Eve"
-            ],
+            "disliked_shifts": [],
             "unavailable_dates": [
                 "2025-12-24",
                 "2025-12-31"
@@ -130,8 +116,7 @@
             "preferred_shift": "MORNING",
             "preferred_day_off": "THURSDAY",
             "disliked_shifts": [
-                "NIGHT",
-                "New Year's Day"
+                "NIGHT"
             ],
             "unavailable_dates": [
                 "2026-01-01"
@@ -141,13 +126,75 @@
             "worker_id": 12,
             "preferred_shift": "AFTERNOON",
             "preferred_day_off": "TUESDAY",
-            "disliked_shifts": [
-                "Christmas Eve",
-                "Christmas Day"
-            ],
+            "disliked_shifts": [],
             "unavailable_dates": [
                 "2025-12-24",
                 "2025-12-25"
+            ]
+        },
+        {
+            "worker_id": 13,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "SUNDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": [
+                "2025-12-31"
+            ]
+        },
+        {
+            "worker_id": 14,
+            "preferred_shift": "NIGHT",
+            "preferred_day_off": null,
+            "disliked_shifts": [],
+            "unavailable_dates": [
+                "2025-12-24",
+                "2025-12-25"
+            ]
+        },
+        {
+            "worker_id": 15,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "SATURDAY",
+            "disliked_shifts": [
+                "MORNING"
+            ],
+            "unavailable_dates": [
+                "2026-01-01"
+            ]
+        },
+        {
+            "worker_id": 16,
+            "preferred_shift": "MORNING",
+            "preferred_day_off": "FRIDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": [
+                "2025-12-26"
+            ]
+        },
+        {
+            "worker_id": 17,
+            "preferred_shift": "AFTERNOON",
+            "preferred_day_off": "MONDAY",
+            "disliked_shifts": [
+                "NIGHT"
+            ],
+            "unavailable_dates": [
+                "2025-12-25"
+            ]
+        },
+        {
+            "worker_id": 18,
+            "preferred_shift": "NIGHT",
+            "preferred_day_off": "THURSDAY",
+            "disliked_shifts": [
+                "MORNING"
+            ],
+            "unavailable_dates": [
+                "2025-12-31"
             ]
         }
     ]
