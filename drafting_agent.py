@@ -25,19 +25,20 @@ def generate_schedule_draft(violations=None, previous_code="", fairness_feedback
     # vincoli dettati dalla traccia, eventualemtne li mettiamo in un file a parte o laciamo cosi, vediamo
     hospital_rules = """
     REGOLE GENERALI (DA RISPETTARE TASSATIVAMENTE NELLA COSTRUZIONE DEL MODELLO):
-    1. Orizzonte temporale: Dal 7 Dicembre 2026 al 6 Gennaio 2027 (31 giorni totali).
+    1. Orizzonte temporale: Dal 7 Dicembre 2026 al 6 Gennaio 2027 (31 giorni totali). Il giorno 0 è un Lunedì.
     2. Turni giornalieri: 3 turni. Mattina (8-14), Pomeriggio (14-20), Notte (20-8).
-    3. Carico di lavoro: Mattina e Pomeriggio valgono 1 turno. La Notte vale come 2 turni (turno doppio).
-    4. Ore massime: Nessun dipendente può superare le 36 ore a settimana.
-    5. Totale turni mese: Ogni lavoratore deve coprire l'equivalente di 25 turni in un mese.
-    6. Regola Riposo Notturno: È obbligatorio garantire a ciascun dipendente DUE giorni liberi consecutivi dopo ogni turno di notte.
-    7. Limite giornaliero: Max 1 turno al giorno per lavoratore
-    8. Riposo settimanale: Almeno un giorno di riposo garantito a settimana (finestra mobile di 7 giorni).
-    
-    SCENARIO B (Livelli minimi di personale):
-    - Ci sono 13 lavoratori standard, indici da 0 a 12 e 6 lavoratori specializzati, indici da 13 a 18
-    - Almeno 2 lavoratori standard e 1 lavoratore specializzato devono essere assegnati a ogni turno.
-    - Un lavoratore specializzato può svolgere il ruolo di lavoratore standard (es. un turno può essere coperto da due specializzati e uno standard)
+    3. Carico di lavoro: Mattina e Pomeriggio valgono 1 turno equivalente. La Notte vale 2 turni equivalenti.
+    4. Ore massime (CRITICO): Max 36 ore (ossia 6 turni equivalenti) per SETTIMANA DI CALENDARIO. Valuta i blocchi fissi di 7 giorni (0-6, 7-13, 14-20, 21-27) e il blocco finale (28-30). NON usare la finestra mobile per le ore, usa un ciclo con step 7 (es. range(0, num_days, 7)).
+    5. Totale turni mese (CRITICO): Ogni lavoratore deve coprire ESATTAMENTE 25 turni equivalenti nel mese (usa l'uguaglianza rigida == 25).
+    6. Regola Riposo Notturno: DUE giorni liberi consecutivi obbligatori dopo ogni turno di notte. (Usa l'if per controllare i limiti dell'array).
+    7. Limite giornaliero: Max 1 turno al giorno per lavoratore.
+    8. Riposo settimanale: Almeno 1 giorno libero garantito per ogni settimana di calendario (valutato sugli stessi blocchi fissi di 7 giorni).
+
+    SCENARIO B (STAFFING):
+    - Ci sono 19 lavoratori totali: indici da 0 a 12 sono STANDARD, indici da 13 a 18 sono SPECIALIZZATI.
+    - REQUISITO MATEMATICO: In ogni turno la somma TOTALE dei lavoratori assegnati deve essere >= 3.
+    - Di questi, ALMENO 1 deve essere un lavoratore SPECIALIZZATO (indici 13-18).
+    - Gli specializzati possono coprire il ruolo degli standard. NON inserire vincoli rigidi esclusivi per gli standard, basta garantire il totale >= 3 e gli specializzati >= 1.
     """
     violations_list = ""
 

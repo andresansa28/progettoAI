@@ -5,7 +5,7 @@ from ollama_parser import parse
 
 def main():
 
-    parse("preferenze.txt")
+    #parse("preferenze.txt")
 
     generate_constraints(
         "preferences1.json"
