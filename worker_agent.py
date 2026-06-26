@@ -2,8 +2,11 @@ from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 import os
+from dotenv import load_dotenv
 
-os.environ["GOOGLE_API_KEY"] = "chiave"
+load_dotenv()
+google_key = os.getenv("GOOGLE_API_KEY")
+os.environ["GOOGLE_API_KEY"] = google_key
 
 
 def generate_constraints(file_json):

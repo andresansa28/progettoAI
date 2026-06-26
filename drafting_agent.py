@@ -2,16 +2,16 @@ import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_ollama import ChatOllama
+from dotenv import load_dotenv
 
 
 def generate_schedule_draft(violations=None, previous_code="", fairness_feedback=""):
     print("Avvio Drafting Agent")
 
-    os.environ["GOOGLE_API_KEY"] = (
-        "chiave"
-    )
-
+    load_dotenv()
+    google_key = os.getenv("GOOGLE_API_KEY")
+    os.environ["GOOGLE_API_KEY"] = google_key
+    
     try:
         # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
         llm = ChatGoogleGenerativeAI(
