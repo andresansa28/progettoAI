@@ -4,59 +4,67 @@ from ortools.sat.python import cp_model
 import LLM_constraints
 
 def add_staffing_constraints(model, shift_vars, num_workers, num_days, shifts):
-    # Standard: 0-12, Specializzati: 13-18
-    standard_workers = range(13)
+    # 19 lavoratori: 0-12 standard, 13-18 specializzati
     specialized_workers = range(13, 19)
     
     for d in range(num_days):
         for s in shifts:
-            # Almeno 2 standard + 1 specializzato (i specializzati possono fare da standard)
-            # Totale minimo 3 persone per turno
+            # Totale lavoratori per turno >= 3
             model.Add(sum(shift_vars[(w, d, s)] for w in range(num_workers)) >= 3)
-            # Almeno 1 specializzato
+            # Almeno 1 specializzato per turno
             model.Add(sum(shift_vars[(w, d, s)] for w in specialized_workers) >= 1)
-            # Almeno 2 standard (inclusi i specializzati che contano come standard)
-            model.Add(sum(shift_vars[(w, d, s)] for w in range(num_workers)) >= 3)
 
 def add_rest_constraints(model, shift_vars, num_workers, num_days, shifts):
+    MORNING, AFTERNOON, NIGHT = shifts
+    
     for w in range(num_workers):
         for d in range(num_days):
-            # Max 1 turno al giorno
+            # Limite giornaliero: Max 1 turno al giorno
             model.Add(sum(shift_vars[(w, d, s)] for s in shifts) <= 1)
             
-            # Regola Riposo Notturno: Se notte al giorno d, liberi d+1 e d+2
-            if d < num_days - 2:
-                model.Add(sum(shift_vars[(w, d, 2)] for s in shifts) == 1).OnlyEnforceIf(
-                    [shift_vars[(w, d+1, s)].Not() for s in shifts] + 
-                    [shift_vars[(w, d+2, s)].Not() for s in shifts]
-                )
-        
-        # Riposo settimanale: almeno 1 giorno libero ogni 7 giorni
-        for d in range(num_days - 6):
-            model.Add(sum(shift_vars[(w, d + i, s)] for i in range(7) for s in shifts) <= 6)
+            # Regola Riposo Notturno: Se notte oggi, allora turni domani = 0 e dopodomani = 0
+            if d + 2 < num_days:
+                model.Add(sum(shift_vars[(w, d + 1, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
+                model.Add(sum(shift_vars[(w, d + 2, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
+            elif d + 1 < num_days:
+                model.Add(sum(shift_vars[(w, d + 1, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
+
+        # Riposo settimanale: Almeno 1 giorno libero per ogni blocco di 7 giorni
+        for start_block in range(0, num_days, 7):
+            end_block = min(start_block + 7, num_days)
+            # Somma dei giorni lavorati nel blocco
+            days_worked = []
+            for d in range(start_block, end_block):
+                is_working = model.NewBoolVar(f'work_{w}_{d}')
+                model.Add(is_working == sum(shift_vars[(w, d, s)] for s in shifts))
+                days_worked.append(is_working)
+            
+            # Almeno un giorno libero (somma dei lavorati <= lunghezza_blocco - 1)
+            model.Add(sum(days_worked) <= (end_block - start_block) - 1)
 
 def add_workload_constraints(model, shift_vars, num_workers, num_days, shifts):
-    # Carico: Mattina/Pomeriggio = 1, Notte = 2
-    # Totale 25 turni al mese
+    MORNING, AFTERNOON, NIGHT = shifts
+    
     for w in range(num_workers):
-        total_load = []
-        for d in range(num_days):
-            total_load.append(shift_vars[(w, d, 0)] * 1) # Mattina
-            total_load.append(shift_vars[(w, d, 1)] * 1) # Pomeriggio
-            total_load.append(shift_vars[(w, d, 2)] * 2) # Notte
+        # Totale turni mese == 25 (Notte = 2, altri = 1)
+        total_load = sum(
+            shift_vars[(w, d, MORNING)] * 1 + 
+            shift_vars[(w, d, AFTERNOON)] * 1 + 
+            shift_vars[(w, d, NIGHT)] * 2 
+            for d in range(num_days)
+        )
+        model.Add(total_load == 25)
         
-        model.Add(sum(total_load) == 25)
-        
-        # Ore massime: 36h a settimana. 
-        # Assumendo 6h per turno (M/P) e 12h per notte.
-        # In 7 giorni, max 36 ore.
-        for d in range(num_days - 6):
-            weekly_load = []
-            for i in range(7):
-                weekly_load.append(shift_vars[(w, d + i, 0)] * 6)
-                weekly_load.append(shift_vars[(w, d + i, 1)] * 6)
-                weekly_load.append(shift_vars[(w, d + i, 2)] * 12)
-            model.Add(sum(weekly_load) <= 36)
+        # Ore massime: Max 6 turni equivalenti per blocco di 7 giorni
+        for start_block in range(0, num_days, 7):
+            end_block = min(start_block + 7, num_days)
+            weekly_load = sum(
+                shift_vars[(w, d, MORNING)] * 1 + 
+                shift_vars[(w, d, AFTERNOON)] * 1 + 
+                shift_vars[(w, d, NIGHT)] * 2 
+                for d in range(start_block, end_block)
+            )
+            model.Add(weekly_load <= 6)
 
 def add_fairness_objective(model, shift_vars, num_workers, num_days, shifts, shift_mapping):
     worker_satisfaction = {}
@@ -90,6 +98,12 @@ def add_fairness_objective(model, shift_vars, num_workers, num_days, shifts, shi
     min_sat = model.NewIntVar(-1000, 1000, 'min_sat')
     model.AddMinEquality(min_sat, [worker_satisfaction[w] for w in range(num_workers)])
     model.Maximize(min_sat)
+    
+    # --- VINCOLI DI TOLLERANZA FAIRNESS SULLE PREFERENZE ---
+    MIN_BOUNDS = {0: 45, 1: 35, 2: 40, 3: 30, 4: 40, 5: 45, 6: 45, 7: 30, 8: 45, 9: 75, 10: 45, 11: 30, 12: 55, 13: 40, 14: 30, 15: 50, 16: 40, 17: 30, 18: 30}
+    
+    for w_idx, min_score in MIN_BOUNDS.items():
+        model.Add(worker_satisfaction[w_idx] >= min_score)
     
     return worker_satisfaction
                                                        

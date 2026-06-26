@@ -1,6 +1,4 @@
-from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_ollama import ChatOllama
 import os
 from dotenv import load_dotenv
 

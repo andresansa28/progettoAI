@@ -2,7 +2,6 @@ import os
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-from langchain_ollama import ChatOllama
 from dotenv import load_dotenv
 
 def generate_schedule_draft(violations=None, previous_code="", fairness_feedback=""):
