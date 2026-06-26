@@ -4,6 +4,10 @@ from datetime import date, timedelta
 START_DATE = date(2026, 12, 7)
 END_DATE = date(2027, 1, 6)
 
+LAVORATORI = 13
+GIORNI = 31
+TURNI = 3
+
 # Turni
 MORNING = 0
 AFTERNOON = 1
@@ -26,3 +30,7 @@ MIN_WORKERS_PER_SHIFT = 2
 MAX_HOURS_PER_WEEK = 36
 SHIFTS_PER_MONTH = 25
 REST_DAYS_AFTER_NIGHT = 2
+
+#Vincoli tentavi
+MAX_ATTEMPTS = 8
+MAX_REFINEMENTS = 10

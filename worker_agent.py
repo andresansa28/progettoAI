@@ -3,9 +3,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_ollama import ChatOllama
 import os
 
-
-
 os.environ["GOOGLE_API_KEY"] = "chiave"
+
 
 def generate_constraints(file_json):
 
@@ -60,19 +59,21 @@ def generate_constraints(file_json):
         return score
 
     """
-    #llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
+    # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
     # llm = ChatOpenAI(
     #     model="poolside/laguna-m.1:free",
-    #     base_url="https://openrouter.ai/api/v1", 
+    #     base_url="https://openrouter.ai/api/v1",
     #     api_key="chiave",
-    #     temperature=0,  
+    #     temperature=0,
     # )
     llm = ChatGoogleGenerativeAI(
-            model="gemini-3.1-flash-lite",
-            temperature=0,
-        )
-    
-    print("Generazione dei vincoli in corso")
+        model="gemini-3.1-flash-lite",
+        temperature=0,
+    )
+
+    print("\n" + "=" * 70)
+    print(f"[FASE 1] GENERAZIONE VINCOLI")
+    print("=" * 70)
 
     try:
         result = llm.invoke(prompt)

@@ -13,7 +13,7 @@ def main():
         "violations": [],
         "violation_history": [],
         "current_code": "",
-        "solved": False,
+        "respected": False,
         "fairness_dict": {}
     }
 

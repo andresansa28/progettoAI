@@ -1,14 +1,11 @@
 from datetime import date, timedelta
+from config import *
 
 def print_schedule_terminal(solver, shifts, lavoratori, giorni):
     """
     Stampa il calendario in formato tabellare nel terminale.
     Richiede gli oggetti solver e shifts restituiti da OR-Tools.
-    """
-    MORNING = 0
-    AFTERNOON = 1
-    NIGHT = 2
-    
+    """    
     start_date = date(2026, 12, 7)
     
     print("\n" + "="*88)
