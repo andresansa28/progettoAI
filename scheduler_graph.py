@@ -225,7 +225,7 @@ MAX_GLOBAL_DROP = 70
 
 
 def fairness_router(state: SchedulerState):
-    print("\n=== FAIRNESS ROUTER ===")
+    print("\n=== FAIRNESS UPDATE ===")
 
     worst_worker = state.get("worst_worker")
     
