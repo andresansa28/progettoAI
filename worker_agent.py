@@ -71,7 +71,9 @@ def generate_constraints(file_json):
             temperature=0,
         )
     
-    print("Generazione dei vincoli in corso")
+    print("\n" + "=" * 70)
+    print("[FASE 1] GENERAZIONE VINCOLI")
+    print("=" * 70)
 
     try:
         result = llm.invoke(prompt)

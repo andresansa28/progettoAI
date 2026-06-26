@@ -6,7 +6,6 @@ import LLM_constraints
 def add_staffing_constraints(model, shift_vars, num_workers, num_days, shifts):
     # 19 lavoratori: 0-12 standard, 13-18 specializzati
     specialized_workers = range(13, 19)
-    MORNING, AFTERNOON, NIGHT = shifts
     
     for d in range(num_days):
         for s in shifts:
@@ -24,21 +23,24 @@ def add_rest_constraints(model, shift_vars, num_workers, num_days, shifts):
             model.Add(sum(shift_vars[(w, d, s)] for s in shifts) <= 1)
             
             # Regola Riposo Notturno: Se notte oggi, allora turni domani = 0 e dopodomani = 0
-            if d + 1 < num_days:
-                model.Add(sum(shift_vars[(w, d + 1, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
             if d + 2 < num_days:
+                model.Add(sum(shift_vars[(w, d + 1, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
                 model.Add(sum(shift_vars[(w, d + 2, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
+            elif d + 1 < num_days:
+                model.Add(sum(shift_vars[(w, d + 1, s)] for s in shifts) == 0).OnlyEnforceIf(shift_vars[(w, d, NIGHT)])
 
-        # Riposo settimanale: Almeno 1 giorno libero per ogni blocco di 7 giorni (0-6, 7-13, 14-20, 21-27)
-        # Il blocco finale 28-30 non ha vincolo di riposo settimanale esplicito richiesto
-        for start_block in range(0, 28, 7):
+        # Riposo settimanale: Almeno 1 giorno libero per ogni blocco di 7 giorni
+        for start_block in range(0, num_days, 7):
+            end_block = min(start_block + 7, num_days)
+            # Somma dei giorni lavorati nel blocco
             days_worked = []
-            for d in range(start_block, start_block + 7):
+            for d in range(start_block, end_block):
                 is_working = model.NewBoolVar(f'work_{w}_{d}')
                 model.Add(is_working == sum(shift_vars[(w, d, s)] for s in shifts))
                 days_worked.append(is_working)
-            # Almeno 1 libero significa massimo 6 lavorati
-            model.Add(sum(days_worked) <= 6)
+            
+            # Almeno un giorno libero (somma dei lavorati <= lunghezza_blocco - 1)
+            model.Add(sum(days_worked) <= (end_block - start_block) - 1)
 
 def add_workload_constraints(model, shift_vars, num_workers, num_days, shifts):
     MORNING, AFTERNOON, NIGHT = shifts
@@ -53,18 +55,18 @@ def add_workload_constraints(model, shift_vars, num_workers, num_days, shifts):
         )
         model.Add(total_load == 25)
         
-        # Ore massime: Max 6 turni equivalenti per blocco di 7 giorni (0-6, 7-13, 14-20, 21-27)
-        for start_block in range(0, 28, 7):
+        # Ore massime: Max 6 turni equivalenti per blocco di 7 giorni
+        for start_block in range(0, num_days, 7):
+            end_block = min(start_block + 7, num_days)
             weekly_load = sum(
                 shift_vars[(w, d, MORNING)] * 1 + 
                 shift_vars[(w, d, AFTERNOON)] * 1 + 
                 shift_vars[(w, d, NIGHT)] * 2 
-                for d in range(start_block, start_block + 7)
+                for d in range(start_block, end_block)
             )
             model.Add(weekly_load <= 6)
 
 def add_fairness_objective(model, shift_vars, num_workers, num_days, shifts, shift_mapping):
-    # MATEMATICA DELLE PREFERENZE (NON TOCCARE)
     worker_satisfaction = {}
     start_date = date(2026, 12, 7)
     shift_names = {0: "MORNING", 1: "AFTERNOON", 2: "NIGHT"}
@@ -96,6 +98,12 @@ def add_fairness_objective(model, shift_vars, num_workers, num_days, shifts, shi
     min_sat = model.NewIntVar(-1000, 1000, 'min_sat')
     model.AddMinEquality(min_sat, [worker_satisfaction[w] for w in range(num_workers)])
     model.Maximize(min_sat)
+    
+    # --- VINCOLI DI TOLLERANZA FAIRNESS SULLE PREFERENZE ---
+    MIN_BOUNDS = {0: 45, 1: 40, 2: 35, 3: 35, 4: 30, 5: 30, 6: 30, 7: 35, 8: 35, 9: 55, 10: 40, 11: 35, 12: 55, 13: 30, 14: 30, 15: 55, 16: 30, 17: 35, 18: 35}
+    
+    for w_idx, min_score in MIN_BOUNDS.items():
+        model.Add(worker_satisfaction[w_idx] >= min_score)
     
     return worker_satisfaction
                                                        

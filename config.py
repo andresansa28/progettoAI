@@ -13,6 +13,12 @@ MORNING = 0
 AFTERNOON = 1
 NIGHT = 2
 
+SHIFT_NAMES = {
+    MORNING: "Morning",
+    AFTERNOON: "Afternoon",
+    NIGHT: "Night"
+}
+
 SHIFT_HOURS = {
     MORNING: 6,
     AFTERNOON: 6,
