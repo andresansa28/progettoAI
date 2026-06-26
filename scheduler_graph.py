@@ -294,7 +294,7 @@ def fairness_router(state: SchedulerState):
 
 def hard_router(state: SchedulerState):
 
-    is_solved = state.get("solved", False)
+    is_solved = state.get("respected", False)
     current_attempt = state.get("attempt", 0)
 
     if is_solved:
