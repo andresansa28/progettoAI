@@ -13,7 +13,6 @@ def generate_schedule_draft(violations=None, previous_code="", fairness_feedback
     os.environ["GOOGLE_API_KEY"] = google_key
     
     try:
-        # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
         llm = ChatGoogleGenerativeAI(
             model="gemini-3.1-flash-lite",
             temperature=0,
@@ -235,57 +234,6 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(f"ERRORE durante la generazione: {e}")
-
-
-# def fairness_refinement(fairness_section, fairness_feedback, vecchio_codice, llm):
-#     print("Avvio Fase di Refinement della Fairness...")
-#     prompt_template = ChatPromptTemplate.from_template("""
-# Sei un Senior Python Engineer specializzato in Google OR-Tools.
-# Il tuo compito è prendere il codice di un calendario ospedaliero funzionante e modificarlo SOLO per migliorare l'equità (fairness).
-
-# {fairness_section}
-
-# DETTAGLI DEL FEEDBACK:
-# {fairness_feedback}
-
-# STRATEGIE OR-TOOLS CONSIGLIATE PER IL BILANCIAMENTO:
-# Per migliorare la fairness del lavoratore svantaggiato senza distruggere gli altri, puoi applicare queste modifiche nella funzione `solve_shift_scheduling` o `add_fairness_objective`:
-# 1. (Consigliata) Aggiungi un vincolo inferiore protettivo per gli altri lavoratori. Ad esempio: `model.Add(worker_satisfaction[w] >= punteggio_minimo)` per evitare che crollino.
-# 2. Aggiungi vincoli che forzino il giorno libero preferito per il lavoratore svantaggiato (es. somma dei turni in quel giorno = 0).
-# 3. Usa la funzione obiettivo `model.Maximize(min_satisfaction)` creando una variabile che rappresenta il punteggio minimo tra tutti i lavoratori.
-
-# CODICE PRECEDENTE DA MODIFICARE:
-# {vecchio_codice}
-
-# Restituisci ESCLUSIVAMENTE il codice Python completo aggiornato.
-#     """)
-    
-#     try:
-#         parser = StrOutputParser()
-#         chain = prompt_template | llm | parser
-
-#         risultato_grezzo = chain.invoke({
-#             "fairness_section": fairness_section, 
-#             "fairness_feedback": fairness_feedback, 
-#             "vecchio_codice": vecchio_codice
-#         })
-
-#         codice_pulito = (
-#             risultato_grezzo.replace("```python\n", "")
-#             .replace("```python", "")
-#             .replace("```", "")
-#             .strip()
-#         )
-
-#         output_filename = "schedule_draft_model.py"
-#         with open(output_filename, "w", encoding="utf-8") as f:
-#             f.write(codice_pulito)
-
-#         print(f"SUCCESSO! Il file '{output_filename}' è stato raffinato per la Fairness.")
-
-#     except Exception as e:
-#         print(f"ERRORE durante il refinement: {e}")
-
 
 
 def fairness_refinement(fairness_section, fairness_feedback, vecchio_codice, llm):

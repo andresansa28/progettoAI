@@ -1,8 +1,10 @@
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
-from langchain_ollama import ChatOllama
+from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
+import os
 
 # =====================================================
 # SCHEMA JSON
@@ -128,13 +130,19 @@ Se un'informazione non è presente usa null oppure [].
     ]
 )
 
-# =====================================================
-# OLLAMA
-# =====================================================
 
-llm = ChatOllama(model="llama3.1:8b", temperature=0).with_structured_output(
-    PreferencesFile
-)
+
+load_dotenv()
+google_key = os.getenv("GOOGLE_API_KEY")
+os.environ["GOOGLE_API_KEY"] = google_key
+
+try:
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-3.1-flash-lite",
+        temperature=0,
+    ).with_structured_output(PreferencesFile)
+except Exception as e:
+    print(f"Errore nell'inizializzazione di Gemini: {e}")
 
 
 # =====================================================
@@ -158,7 +166,6 @@ def parse(path_file):
 
     print("Lettura file testule in corso")
     preferences = extract_preferences(text)
-    # print(preferences.model_dump_json(indent=4))
     # Creazione fisica del file
     with open("preferences1.json", "w", encoding="utf-8") as f:
         f.write(preferences.model_dump_json(indent=4))
