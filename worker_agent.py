@@ -59,13 +59,6 @@ def generate_constraints(file_json):
         return score
 
     """
-    #llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
-    # llm = ChatOpenAI(
-    #     model="poolside/laguna-m.1:free",
-    #     base_url="https://openrouter.ai/api/v1", 
-    #     api_key="chiave",
-    #     temperature=0,  
-    # )
     llm = ChatGoogleGenerativeAI(
             model="gemini-3.1-flash-lite",
             temperature=0,
@@ -78,18 +71,15 @@ def generate_constraints(file_json):
     try:
         result = llm.invoke(prompt)
 
-        # --- INIZIO FIX PER GEMINI ---
         contenuto = result.content
 
         if isinstance(contenuto, list):
-            # Estraiamo il testo dal primo blocco della lista
+            # estraiamo il testo dal primo blocco della lista
             testo_grezzo = contenuto[0].get("text", "")
         else:
-            # Se è già una normale stringa, la teniamo così
             testo_grezzo = contenuto
-        # --- FINE FIX ---
 
-        # Ora facciamo la pulizia in totale sicurezza sulla stringa estratta
+        # pulizia output ricevuto dall'llm
         codice = (
             testo_grezzo.replace("```python\n", "")
             .replace("```python", "")

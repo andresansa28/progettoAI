@@ -26,7 +26,6 @@ def calcola_fairness_dizionario(solver, shifts, num_workers, num_days):
             if not lavorato_oggi:
                 assigned_days_off_list.append(day_name)
                 
-        # Calcolo punti sincronizzato al 100%
         score = LLM_constraints.evaluate_worker_satisfaction(w, assigned_shifts_list, assigned_days_off_list)
         fairness_dict[w] = score
         

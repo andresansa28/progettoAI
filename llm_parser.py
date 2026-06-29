@@ -2,7 +2,6 @@ from typing import List, Optional
 
 import os
 from pydantic import BaseModel, Field
-from langchain_ollama import ChatOllama
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.prompts import ChatPromptTemplate
 from dotenv import load_dotenv
@@ -131,20 +130,12 @@ Se un'informazione non è presente usa null oppure [].
     ]
 )
 
-# =====================================================
-# OLLAMA
-# =====================================================
-
-# llm = ChatOllama(model="llama3.1:8b", temperature=0).with_structured_output(
-#     PreferencesFile
-# )
 
 load_dotenv()
 google_key = os.getenv("GOOGLE_API_KEY")
 os.environ["GOOGLE_API_KEY"] = google_key
 
 try:
-    # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
     llm = ChatGoogleGenerativeAI(
         model="gemini-3.1-flash-lite",
         temperature=0,
@@ -174,7 +165,6 @@ def parse(path_file):
 
     print("Lettura file testule in corso")
     preferences = extract_preferences(text)
-    # print(preferences.model_dump_json(indent=4))
     # Creazione fisica del file
     with open("preferences1.json", "w", encoding="utf-8") as f:
         f.write(preferences.model_dump_json(indent=4))

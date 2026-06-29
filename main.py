@@ -1,6 +1,6 @@
 from worker_agent import generate_constraints
 from scheduler_graph import graph
-from ollama_parser import parse
+from llm_parser import parse
 
 
 def main():

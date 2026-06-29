@@ -12,7 +12,6 @@ def generate_schedule_draft(violations=None, previous_code="", fairness_feedback
     os.environ["GOOGLE_API_KEY"] = google_key
 
     try:
-        # llm = ChatOllama(model="glm-4.7:cloud", temperature=0)
         llm = ChatGoogleGenerativeAI(
             model="gemini-3.1-flash-lite",
             temperature=0,
