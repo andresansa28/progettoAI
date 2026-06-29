@@ -130,7 +130,12 @@ def verifier_node(state: SchedulerState):
     history.append(violations)
 
     respected = len(violations) == 0
-    next_attempt = state.get("attempt", 0) + 1
+    is_refinement = bool(state.get("fairness_feedback", ""))
+
+    if is_refinement:
+        next_attempt = state.get("attempt", 0)
+    else:
+        next_attempt = state.get("attempt", 0) + 1
 
     if respected:
         print("Tutti i vincoli HARD sono rispettati!")

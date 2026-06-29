@@ -95,15 +95,15 @@ def add_fairness_objective(model, shift_vars, num_workers, num_days, shifts, shi
         model.Add(sat_var == score_expr)
         worker_satisfaction[w] = sat_var
         
-    min_sat = model.NewIntVar(-1000, 1000, 'min_sat')
-    model.AddMinEquality(min_sat, [worker_satisfaction[w] for w in range(num_workers)])
-    model.Maximize(min_sat)
-    
     # --- VINCOLI DI TOLLERANZA FAIRNESS SULLE PREFERENZE ---
-    MIN_BOUNDS = {0: 45, 1: 40, 2: 35, 3: 35, 4: 30, 5: 30, 6: 30, 7: 35, 8: 35, 9: 55, 10: 40, 11: 35, 12: 55, 13: 30, 14: 30, 15: 55, 16: 30, 17: 35, 18: 35}
+    MIN_BOUNDS = {0: 60, 1: 40, 2: 45, 3: 50, 4: 30, 5: 35, 6: 40, 7: 40, 8: 30, 9: 55, 10: 45, 11: 30, 12: 55, 13: 35, 14: 30, 15: 35, 16: 30, 17: 35, 18: 30}
     
     for w_idx, min_score in MIN_BOUNDS.items():
         model.Add(worker_satisfaction[w_idx] >= min_score)
+        
+    min_sat = model.NewIntVar(-1000, 1000, 'min_sat')
+    model.AddMinEquality(min_sat, [worker_satisfaction[w] for w in range(num_workers)])
+    model.Maximize(min_sat)
     
     return worker_satisfaction
                                                        
